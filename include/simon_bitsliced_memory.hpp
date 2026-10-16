@@ -48,3 +48,13 @@ struct alignas(kAlignment) SimonBitsliceMatch {
             }
             planes[bit] = plane_bits;
         }
+
+        for (int reg_idx = 0; reg_idx < 16; ++reg_idx) {
+            uint64_t p0 = planes[reg_idx * 4 + 0];
+            uint64_t p1 = planes[reg_idx * 4 + 1];
+            uint64_t p2 = planes[reg_idx * 4 + 2];
+            uint64_t p3 = planes[reg_idx * 4 + 3];
+
+            regs[reg_idx = _mm256_set_epi64x(static_cast<int64_t>(p3), static_cast<int64_t>(p2), static_cast<int64_t>(p1), static_cast<int64_t>(p0));
+        }
+    }
