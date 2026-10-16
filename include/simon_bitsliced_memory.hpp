@@ -26,3 +26,12 @@ struct alignas(kAlignment) SimonBitsliceMatch {
             regs[i] = _mm256_setzero_si256();
         }
     }
+
+    inline void transpose_from_linear(const uint8_t* src) noexcept {
+        uint32_t blocks_x[64];
+        uint32_t blocks_y[64];
+
+        for (int i = 0; i < 64; ++i) {
+            std::memcpy(&blocks_x[i], src + (i*8), 4);
+            std::memcpy(&blocks_y[i], src + (i*8), 4);
+        }
