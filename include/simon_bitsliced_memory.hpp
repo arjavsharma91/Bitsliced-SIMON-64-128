@@ -35,3 +35,16 @@ struct alignas(kAlignment) SimonBitsliceMatch {
             std::memcpy(&blocks_x[i], src + (i*8), 4);
             std::memcpy(&blocks_y[i], src + (i*8), 4);
         }
+
+        uint64_t planes[64];
+        for (int bit = 0; bit < 64; ++bit) {
+            uint64_t plane_bits = 0;
+            for (int block = 0; block < 64; ++block) {
+                uint32_t val = (bit < 32) ? blocks_x[block] : blocks_y[block];
+                int shift = bit % 32;
+                if ((val >> shift) & 1U) {
+                    plane_bits |= (1ULL << block);
+                }
+            }
+            planes[bit] = plane_bits;
+        }
