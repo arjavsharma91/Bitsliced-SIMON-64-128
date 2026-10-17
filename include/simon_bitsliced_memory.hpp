@@ -25,19 +25,16 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         }
     }
 
-    // 100% Pure-Vector Transpose: Zero scalar loops, zero GPR bounces, 
-    // running entirely inside YMM vector execution units.
+
     inline void transpose_from_linear(const uint8_t* src) noexcept {
         const __m256i* src_vec = reinterpret_cast<const __m256i*>(src);
         __m256i t[16];
 
-        // Load 512 bytes (16 YMM registers) directly into vector registers
         #pragma GCC unroll 16
         for (int i = 0; i < 16; ++i) {
             t[i] = _mm256_loadu_si256(src_vec + i);
         }
 
-        // --- STAGE 1: 32-bit word interleaving ---
         __m256i u0  = _mm256_unpacklo_epi32(t[0], t[1]);   __m256i u1  = _mm256_unpackhi_epi32(t[0], t[1]);
         __m256i u2  = _mm256_unpacklo_epi32(t[2], t[3]);   __m256i u3  = _mm256_unpackhi_epi32(t[2], t[3]);
         __m256i u4  = _mm256_unpacklo_epi32(t[4], t[5]);   __m256i u5  = _mm256_unpackhi_epi32(t[4], t[5]);
@@ -47,7 +44,6 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         __m256i u12 = _mm256_unpacklo_epi32(t[12], t[13]); __m256i u13 = _mm256_unpackhi_epi32(t[12], t[13]);
         __m256i u14 = _mm256_unpacklo_epi32(t[14], t[15]); __m256i u15 = _mm256_unpackhi_epi32(t[14], t[15]);
 
-        // --- STAGE 2: 64-bit block butterfly ---
         __m256i v0  = _mm256_unpacklo_epi64(u0, u2);   __m256i v1  = _mm256_unpackhi_epi64(u0, u2);
         __m256i v2  = _mm256_unpacklo_epi64(u1, u3);   __m256i v3  = _mm256_unpackhi_epi64(u1, u3);
         __m256i v4  = _mm256_unpacklo_epi64(u4, u6);   __m256i v5  = _mm256_unpackhi_epi64(u4, u6);
@@ -57,7 +53,6 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         __m256i v12 = _mm256_unpacklo_epi64(u12, u14); __m256i v13 = _mm256_unpackhi_epi64(u12, u14);
         __m256i v14 = _mm256_unpacklo_epi64(u13, u15); __m256i v15 = _mm256_unpackhi_epi64(u13, u15);
 
-        // --- STAGE 3: 128-bit cross-lane layout ---
         __m256i w[16];
         w[0]  = _mm256_permute2x128_si256(v0, v4, 0x20);   w[1]  = _mm256_permute2x128_si256(v1, v5, 0x20);
         w[2]  = _mm256_permute2x128_si256(v2, v6, 0x20);   w[3]  = _mm256_permute2x128_si256(v3, v7, 0x20);
@@ -68,7 +63,6 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         w[12] = _mm256_permute2x128_si256(v8, v12, 0x31);  w[13] = _mm256_permute2x128_si256(v9, v13, 0x31);
         w[14] = _mm256_permute2x128_si256(v10, v14, 0x31); w[15] = _mm256_permute2x128_si256(v11, v15, 0x31);
 
-        // --- STAGE 4: Intra-word Bit-Level SWAR Transposition (Pure Vector) ---
         const __m256i m1  = _mm256_set1_epi32(0x55555555);
         const __m256i m2  = _mm256_set1_epi32(0x33333333);
         const __m256i m4  = _mm256_set1_epi32(0x0F0F0F0F);
@@ -189,3 +183,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         }
     }
 };
+
+} // namespace
+
+#endif //simon bitslice memory hpp
