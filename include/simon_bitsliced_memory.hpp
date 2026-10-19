@@ -34,6 +34,8 @@ struct alignas(kAlignment) SimonBitsliceBatch {
             t[i] = _mm256_loadu_si256(src_vec + i);
         }
 
+
+        //stage one
         __m256i u0  = _mm256_unpacklo_epi32(t[0], t[1]);   __m256i u1  = _mm256_unpackhi_epi32(t[0], t[1]);
         __m256i u2  = _mm256_unpacklo_epi32(t[2], t[3]);   __m256i u3  = _mm256_unpackhi_epi32(t[2], t[3]);
         __m256i u4  = _mm256_unpacklo_epi32(t[4], t[5]);   __m256i u5  = _mm256_unpackhi_epi32(t[4], t[5]);
@@ -42,7 +44,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         __m256i u10 = _mm256_unpacklo_epi32(t[10], t[11]); __m256i u11 = _mm256_unpackhi_epi32(t[10], t[11]);
         __m256i u12 = _mm256_unpacklo_epi32(t[12], t[13]); __m256i u13 = _mm256_unpackhi_epi32(t[12], t[13]);
         __m256i u14 = _mm256_unpacklo_epi32(t[14], t[15]); __m256i u15 = _mm256_unpackhi_epi32(t[14], t[15]);
-
+        //stage two
         __m256i v0  = _mm256_unpacklo_epi64(u0, u2);   __m256i v1  = _mm256_unpackhi_epi64(u0, u2);
         __m256i v2  = _mm256_unpacklo_epi64(u1, u3);   __m256i v3  = _mm256_unpackhi_epi64(u1, u3);
         __m256i v4  = _mm256_unpacklo_epi64(u4, u6);   __m256i v5  = _mm256_unpackhi_epi64(u4, u6);
@@ -51,7 +53,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         __m256i v10 = _mm256_unpacklo_epi64(u9, u11);  __m256i v11 = _mm256_unpackhi_epi64(u9, u11);
         __m256i v12 = _mm256_unpacklo_epi64(u12, u14); __m256i v13 = _mm256_unpackhi_epi64(u12, u14);
         __m256i v14 = _mm256_unpacklo_epi64(u13, u15); __m256i v15 = _mm256_unpackhi_epi64(u13, u15);
-
+        //stage 3
         __m256i w[16];
         w[0]  = _mm256_permute2x128_si256(v0, v4, 0x20);   w[1]  = _mm256_permute2x128_si256(v1, v5, 0x20);
         w[2]  = _mm256_permute2x128_si256(v2, v6, 0x20);   w[3]  = _mm256_permute2x128_si256(v3, v7, 0x20);
@@ -67,7 +69,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         const __m256i m4  = _mm256_set1_epi32(0x0F0F0F0F);
         const __m256i m8  = _mm256_set1_epi32(0x00FF00FF);
         const __m256i m16 = _mm256_set1_epi32(0x0000FFFF);
-
+        //stage 4
         #pragma GCC unroll 16
         for (int i = 0; i < 16; ++i) {
             __m256i x = w[i];
@@ -93,13 +95,13 @@ struct alignas(kAlignment) SimonBitsliceBatch {
 
     inline void transpose_to_linear(uint8_t* dest) const noexcept {
         __m256i w[16];
-
+        
         const __m256i m1  = _mm256_set1_epi32(0x55555555);
         const __m256i m2  = _mm256_set1_epi32(0x33333333);
         const __m256i m4  = _mm256_set1_epi32(0x0F0F0F0F);
         const __m256i m8  = _mm256_set1_epi32(0x00FF00FF);
         const __m256i m16 = _mm256_set1_epi32(0x0000FFFF);
-
+        //stage one; stage 4 inverse
         #pragma GCC unroll 16
         for (int i = 0; i < 16; ++i) {
             __m256i x = regs[i];
@@ -121,7 +123,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
 
             w[i] = x;
         }
-
+        // stage 2; stage 3 inverse
         __m256i v[16];
         v[0]  = _mm256_permute2x128_si256(w[0], w[4], 0x20);
         v[1]  = _mm256_permute2x128_si256(w[1], w[5], 0x20);
@@ -139,7 +141,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         v[13] = _mm256_permute2x128_si256(w[9], w[13], 0x31);
         v[14] = _mm256_permute2x128_si256(w[10], w[14], 0x31);
         v[15] = _mm256_permute2x128_si256(w[11], w[15], 0x31);
-
+        //stage 3; stage 2 inverse
         __m256i u0  = _mm256_unpacklo_epi64(v[0], v[1]);
         __m256i u2  = _mm256_unpackhi_epi64(v[0], v[1]);
         __m256i u1  = _mm256_unpacklo_epi64(v[2], v[3]);
@@ -156,7 +158,7 @@ struct alignas(kAlignment) SimonBitsliceBatch {
         __m256i u14 = _mm256_unpackhi_epi64(v[12], v[13]);
         __m256i u13 = _mm256_unpacklo_epi64(v[14], v[15]);
         __m256i u15 = _mm256_unpackhi_epi64(v[14], v[15]);
-
+        //stage 4; stage 1 inverse
         __m256i t[16];
         t[0]  = _mm256_unpacklo_epi32(u0, u1);
         t[1]  = _mm256_unpackhi_epi32(u0, u1);
