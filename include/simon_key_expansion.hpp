@@ -32,3 +32,10 @@ public:
             tmp ^= wk[1];
             uint32_t tmp2 = rotr32(tmp, 1);
             uint32_t next_k = c ^ z_val ^ wk[0] ^ tmp ^ tmp2;
+
+            wk[0] = wk[1];
+            wk[1] = wk[2];
+            wk[2] = wk[3];
+            wk[3] = next_k;
+        }
+    }
