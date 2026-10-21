@@ -39,3 +39,12 @@ public:
             wk[3] = next_k;
         }
     }
+
+    inline __m256i get_round_key(int round) const noexcept {
+        return _mm256_load_si256(&round_keys[round]);
+    }
+};
+
+} // namespace simon
+
+#endif // SIMON_KEY_EXPANSION_HPP
