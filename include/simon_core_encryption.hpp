@@ -36,14 +36,14 @@ public:
 
             __m256i f_res = _mm256_xor_si256(_mm256_and_si256(s1, s8), s2);
 
-            batch.regs[0] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[0], f_res), rk);
-            batch.regs[1] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[1], f_res), rk);
-            batch.regs[2] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[2], f_res), rk);
-            batch.regs[3] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[3], f_res), rk);
-            batch.regs[4] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[4], f_res), rk);
-            batch.regs[5] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[5], f_res), rk);
-            batch.regs[6] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[6], f_res), rk);
-            batch.regs[7] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[7], f_res), rk);
+            batch.regs[0] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[8], f_res), rk);
+            batch.regs[1] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[9], f_res), rk);
+            batch.regs[2] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[10], f_res), rk);
+            batch.regs[3] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[11], f_res), rk);
+            batch.regs[4] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[12], f_res), rk);
+            batch.regs[5] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[13], f_res), rk);
+            batch.regs[6] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[14], f_res), rk);
+            batch.regs[7] = _mm256_xor_si256(_mm256_xor_si256(batch.regs[15], f_res), rk);
 
             batch.regs[8] = l0; batch.regs[9] = l1; batch.regs[10] = l2; batch.regs[11] = l3;
             batch.regs[12] = l4; batch.regs[13] = l5; batch.regs[14] = l6; batch.regs[15] = l7;
