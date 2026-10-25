@@ -26,7 +26,7 @@ public:
         for (int i = 0; i < 44; i++) {
             round_keys[i] = _mm256_set1_epi32(wk[0]);
 
-            uint32_t z_val = (z3 >> (61 - i)) & 1ULL;
+            uint32_t z_val = (z3 >> (63 - i)) & 1ULL;
 
             uint32_t tmp = rotr32(wk[3], 3);
             tmp ^= wk[1];
