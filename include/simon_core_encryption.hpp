@@ -8,7 +8,7 @@
 
 namespace simon {
 
-class alignas(32) SIMON64128Engine {
+class alignas(32) Simon64128Engine {
 private:
     SimonKeyExpansion key_expansion_;
 
@@ -17,3 +17,9 @@ public:
         : key_expansion_(master_key) {}
 
     void encrypt_64_blocs(const uint8_t* plaintext, uint8_t* ciphertext) const noexcept {
+        SimonBitsliceBatch batch;
+        batch.transpose_from_linear(plaintext);
+
+        auto get_L_rot = [&batch](int k) -> __m256i {
+            return batch.regs[k % 8];
+        };
