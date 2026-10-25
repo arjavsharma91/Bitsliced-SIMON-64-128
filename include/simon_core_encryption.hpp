@@ -23,3 +23,13 @@ public:
         auto get_L_rot = [&batch](int k) -> __m256i {
             return batch.regs[k % 8];
         };
+
+        for (int i = 0; i < 44; i++) {
+            __m256i rk = key_expansion_.get_round_key(i);
+
+            __m256i l0 = batch.regs[0], l1 = batch.regs[1], l2 = batch.regs[2], l3 = batch.regs[3];
+            __m256i l4 = batch.regs[4], l5 = batch.regs[5], l6 = batch.regs[6], l7 = batch.regs[7];
+
+            __m256i s1 = get_L_rot(1);
+            __m256i s8 = get_L_rot(8);
+            __m256i s2 = get_L_rot(2);
