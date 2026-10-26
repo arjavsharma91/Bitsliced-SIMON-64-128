@@ -13,3 +13,21 @@ void print_block(const char* label, const uint8_t* block, size_t len) {
     }
     std::cout << std::dec << "\n";
 }
+
+int main() {
+    std::cout << "=================================================\n";
+    std::cout << "  SIMON-64/128 AVX2 Bitsliced Engine Test Harness\n";
+    std::cout << "=================================================\n\n";
+    // official NSA test case btw
+    uint8_t master_key[16] = {
+        0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0a, 0x0b,
+        0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1a, 0x1b
+    };
+
+    uint8_t single_plaintext[8] = {
+        0x75, 0x6e, 0x64, 0x20, 0x6c, 0x69, 0x6b, 0x65
+    };
+
+    uint8_t expected_ciphertext[8] = {
+        0x7a, 0xa0, 0xdf, 0xb9, 0x20, 0xfc, 0xc8, 0x44
+    };
