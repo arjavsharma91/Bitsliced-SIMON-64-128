@@ -31,3 +31,18 @@ int main() {
     uint8_t expected_ciphertext[8] = {
         0x7a, 0xa0, 0xdf, 0xb9, 0x20, 0xfc, 0xc8, 0x44
     };
+
+    constexpr int batch_blocks = 64;
+    constexpr size_t batch_bytes = batch_blocks * 8;
+
+    std::vector<uint8_t> input_batch(batch_bytes);
+    std::vector<uint8_t> output_batch(batch_bytes, 0);
+
+    for (int i = 0; i < batch_blocks; ++i) {
+        std::memcpy(input_batch.data() + (i * 8), single_plaintext, 8);
+    }
+
+    print_block("Input Plaintext (Lane 0)", input_batch.data(), 8);
+    print_block("Master Key              ", master_key, 16);
+    print_block("Expected Ciphertext     ", expected_ciphertext, 8);
+    std::cout << "-------------------------------------------------\n";
