@@ -65,3 +65,24 @@ int main() {
         }
 
         print_block("Computed Ciphertext (Lane 0)", output_batch.data(), 8);
+
+        bool matches_reference = (std::memcmp(output_batch.data(), expected_ciphertext, 8) == 0)
+        if (all_lanes_match && matches_reference) {
+            std::cout << " [+] Verification passed: All 64 parallel lanes match\n";
+            std::cout << "     Ciphertext matches official NSA test vector!\n";
+        } else {
+            if (!all_lanes_match) {
+                std::cout << "[-] Inter lane consistency failed";
+            }
+            if (!matches_reference) {
+                std::cout << "[-] Reference Vector Match Failed";
+            }
+        }
+        std::cout << "======================================\n";
+    } catch {
+        std::cerr << "[!] Exception Caught during test execution: " << e.what() << "\n";
+        return 1;
+    }
+
+    return 0;
+}
