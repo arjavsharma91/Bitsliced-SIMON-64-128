@@ -46,3 +46,22 @@ int main() {
     print_block("Master Key              ", master_key, 16);
     print_block("Expected Ciphertext     ", expected_ciphertext, 8);
     std::cout << "-------------------------------------------------\n";
+
+    try {
+        simon::Simon64128Engine engine(master_key);
+
+        std::cout << "Executing 44-round bitsliced batch encryption across 64 parallel blocks...\n";
+        
+        engine.encrypt_64_blocks(input_batch.data(), output_batch.data());
+
+        std::cout << "Encryption completed successfully!\n\n";
+
+        bool all_lanes_match = true;
+        for (int i = 1; i < batch_blocks; ++i) {
+            if (std::memcmp(output_batch.data(), output_batch.data() + (i * 8), 8) != 0) {
+                all_lanes_match = false;
+                std::cerr << "[!] Lane " << i << " output mismatch!\n";
+            }
+        }
+
+        print_block("Computed Ciphertext (Lane 0)", output_batch.data(), 8);
