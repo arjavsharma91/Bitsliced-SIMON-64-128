@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iomanip>
-#include "simon_engine.hpp"
+#include "simon_core_encryption.hpp"
 
 void print_block(const char* label, const uint8_t* block, size_t len) {
     std::cout << label << ": ";
