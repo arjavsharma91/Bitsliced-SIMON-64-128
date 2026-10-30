@@ -40,7 +40,13 @@ static inline void transpose_from_linear(u256 m[]) noexcept {
 
     // Step two
     const __m256i masktwo = _mm256_set1_epi32(0x33333333);
+    
     q[0] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_si256(m[0], 2), m[2]), masktwo);
     m[2] = _mm256_xor_si256(m[2], q[0]);
     q[0] = _mm256_slli_si256(q[0], 2);
     m[0] = _mm256_xor_si256(m[0], q[0]);
+
+    q[1] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_si256(m[1], 2), m[3]), masktwo);
+    m[2] = _mm256_xor_si256(m[3], q[1]);
+    q[1] = _mm256_slli_si256(q[3], 2);
+    m[1] = _mm256_xor_si256(m[1], q[1]);
