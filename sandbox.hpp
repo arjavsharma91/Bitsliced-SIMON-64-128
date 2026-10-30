@@ -14,9 +14,9 @@
 static inline void transpose_from_linear(u256 m[]) noexcept {
     const __m256i maskone = _mm256_set1_epi32(0x55555555);
     const __m256i maskfour = _mm256_set1_epi32(0x0f0f0f0f);
-    const __m256i masktwo = _mm256_set1_epi32(0x33333333);
-
     u256 q[4];
+
+    // Step one
 
     q[0] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_si256(m[0], 4), m[4]), maskfour);
     m[4] = _mm256_xor_si256(m[4], q[0]);
@@ -37,3 +37,10 @@ static inline void transpose_from_linear(u256 m[]) noexcept {
     m[7] = _mm256_xor_si256(m[7], q[3]);
     q[3] = _mm256_slli_si256(q[3], 4);
     m[3] = _mm256_xor_si256(m[3], q[3]);
+
+    // Step two
+    const __m256i masktwo = _mm256_set1_epi32(0x33333333);
+    q[0] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_si256(m[0], 2), m[2]), masktwo);
+    m[2] = _mm256_xor_si256(m[2], q[0]);
+    q[0] = _mm256_slli_si256(q[0], 2);
+    m[0] = _mm256_xor_si256(m[0], q[0]);
