@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <cstddef>
 
+#define rotr8(x) (_mm256_shuffle_epi8(x, _mm256_set1_epi32(0x0c0f0e0d)))
+
 #if !defined(__AVX2__)
 #error "SIMON Bitsliced Engine requires AVX2 support. Compile with flags: -O3 -mavx2"
 #endif
@@ -88,8 +90,14 @@ struct alignas(32) Simon64128Engine {
             q[3] = _mm256_slli_epi32(q[3], 1);
             m[6] = _mm256_xor_si256(m[6], q[3]);
         }
-    
-    }
+
+        __m256i c = _mm256_set1_epi32(0xffffff00);
+        __m256i d = _mm256_set1_epi32(0xffffffff);
+
+        inline void rkbs(__m256i rk[44][8], int r, __m256i v, __m256i c, __m256i d) noexcept {
+            rk[r][7] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(d, rk[r-4][7], 
+}
+
 
 } // namespace simon
 
