@@ -1,4 +1,4 @@
-// THIS IS A SANDBOX IMPLMEMENTATION OF THE HACKERS DELIGHT CHAPTER 7 BIT MATRIX TRANSPOSITION
+// THIS IS A SANDBOX IMPLMEMENTATION OF THE HACKERS DELIGHT CHAPTER 7 BIT MATRIX TRANSPOSITION (NOT PRODUCTION !!!!!) JS TESTING
 
 #ifndef SIMON_BITSLICE_MEMORY_HPP
 #define SIMON_BITSLICE_MEMORY_HPP
@@ -77,4 +77,12 @@ static inline void transpose_from_linear(u256 m[]) noexcept {
     m[5] = _mm256_xor_si256(q[2], m[5]);
     q[2] = _mm256_slli_epi32(q[2], 1);
     m[4] = _mm256_xor_si256(m[4], q[2]);
+
+    q[3] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_epi32(m[6], 1), m[7]), maskone);
+    m[7] = _mm256_xor_si256(q[3], m[7]);
+    q[3] = _mm256_slli_epi32(q[3], 1);
+    m[6] = _mm256_xor_si256(m[6], q[3]);
+
+    return 0;
+}
     
