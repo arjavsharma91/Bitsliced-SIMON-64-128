@@ -47,13 +47,13 @@ static inline void transpose_from_linear(u256 m[]) noexcept {
 
     q[1] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_epi32(m[1], 2), m[3]), masktwo);
     m[3] = _mm256_xor_si256(m[3], q[1]);
-    q[1] = _mm256_slli_epi32(q[3], 2);
+    q[1] = _mm256_slli_epi32(q[1], 2);
     m[1] = _mm256_xor_si256(m[1], q[1]);
 
     q[2] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_epi32(m[4], 2), m[6]), masktwo);
     m[6] = _mm256_xor_si256(m[6], q[2]);
     q[2] = _mm256_slli_epi32(q[2], 2);
-    m[4] = _mm256_xor_si256(m[4], w[2]);
+    m[4] = _mm256_xor_si256(m[4], q[2]);
 
     q[3] = _mm256_and_si256(_mm256_xor_si256(_mm256_srli_epi32(m[5], 2), m[7]), masktwo);
     m[7] = _mm256_xor_si256(m[7], q[3]);
@@ -82,7 +82,5 @@ static inline void transpose_from_linear(u256 m[]) noexcept {
     m[7] = _mm256_xor_si256(q[3], m[7]);
     q[3] = _mm256_slli_epi32(q[3], 1);
     m[6] = _mm256_xor_si256(m[6], q[3]);
-
-    return 0;
 }
     
