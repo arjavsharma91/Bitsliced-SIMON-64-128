@@ -102,7 +102,7 @@ struct alignas(32) Simon64128Engine {
             rk[r][3] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rk[r-4][3], rk[r-1][6]), rk[r-3][3]), rk[r-1][7]), rk[r-3][4]), d);
             rk[r][2] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rk[r-4][2], rk[r-1][5]), rk[r-3][2]), rk[r-1][6]), rk[r-3][3]), d);
             rk[r][1] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rk[r-4][1], rk[r-1][4]), rk[r-3][1]), rk[r-1][5]), rk[r-3][2]), c);
-            rk[r][2] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rk[r-4][0], rk[r-1][3]), rk[r-3][0]), rk[r-1][4]), rk[r-3][1]), v);            
+            rk[r][0] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rk[r-4][0], rk[r-1][3]), rk[r-3][0]), rk[r-1][4]), rk[r-3][1]), v);            
 }
 
 
