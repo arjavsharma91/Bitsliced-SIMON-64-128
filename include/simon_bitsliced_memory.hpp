@@ -97,6 +97,7 @@ struct alignas(32) Simon64128Engine {
         inline void roundkey(__m256i rk[44][8], int r, __m256i v, __m256i c, __m256i d) noexcept {
             rk[r][7] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rotr8(rk[r-3][0]), rotr8(rk[r-1][3])), rotr8(rk[r-1][2])), rk[r-4][7]), rk[r-3][7]), d);
             rk[r][6] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rotr8(rk[r-1][1], rotr8(rk[r-1][2])), rk[r-4][6]), rk[r-3][6]), rk[r-3][7]), d);
+            rk[r][5] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rotr8(rk[r-1][0], rotr8(rk[r-1][1])), rk[r-4][5]), rk[r-3][5]), rk[r-3][6]), d);
 }
 
 
