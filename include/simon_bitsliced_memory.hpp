@@ -111,16 +111,21 @@ struct alignas(32) Simon64128Engine {
                 transpose_from_linear(rk[i]);
             }
 
-            for (int r=4; r < 44; ++r) {
-                static const uint8_t v_flags[40] = {
+            static const uint8_t v_flags[40] = {
                 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0,
                 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
                 0, 1, 0, 0, 1, 0, 0, 0
-                };
+            };
 
-                const __m256i c = _mm256_set1_epi32(0xFFFFFF00);
-                const __m256i d = _mm256_set1_epi32(0xFFFFFFFF);
+            const __m256i c = _mm256_set1_epi32(0xFFFFFF00);
+            const __m256i d = _mm256_set1_epi32(0xFFFFFFFF);
 
+            #pragma GCC unroll 40
+            for (int i = 4; i < 44; ++i) {
+                __m256i V = v_flags[r-4] ? d : c;
+                roundkey(rk, r, V, c, d);
+            }
+        }
                 
 }
 
