@@ -91,9 +91,6 @@ struct alignas(32) Simon64128Engine {
             m[6] = _mm256_xor_si256(m[6], q[3]);
         }
 
-        __m256i c = _mm256_set1_epi32(0xffffff00);
-        __m256i d = _mm256_set1_epi32(0xffffffff);
-
         inline void roundkey(__m256i rk[44][8], int r, __m256i v, __m256i c, __m256i d) noexcept {
             rk[r][7] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rotr8(rk[r-3][0]), rotr8(rk[r-1][3])), rotr8(rk[r-1][2])), rk[r-4][7]), rk[r-3][7]), d);
             rk[r][6] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(rotr8(rk[r-1][1]), rotr8(rk[r-1][2])), rk[r-4][6]), rk[r-3][6]), rk[r-3][7]), d);
@@ -113,6 +110,18 @@ struct alignas(32) Simon64128Engine {
                 }
                 transpose_from_linear(rk[i]);
             }
+
+            for (int r=4; r < 44; ++r) {
+                static const uint8_t v_flags[40] = {
+                1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0,
+                0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+                0, 1, 0, 0, 1, 0, 0, 0
+                };
+
+                const __m256i c = _mm256_set1_epi32(0xFFFFFF00);
+                const __m256i d = _mm256_set1_epi32(0xFFFFFFFF);
+
+                
 }
 
 } // namespace simon
