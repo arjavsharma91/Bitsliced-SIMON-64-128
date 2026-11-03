@@ -1,3 +1,5 @@
+// this uses hackers delight chapter 7 bit matrix transposition
+
 #ifndef SIMON_BITSLICE_MEMORY_HPP
 #define SIMON_BITSLICE_MEMORY_HPP
 
@@ -123,7 +125,7 @@ struct alignas(32) Simon64128Engine {
             #pragma GCC unroll 40
             for (int i = 4; i < 44; ++i) {
                 __m256i V = v_flags[r-4] ? d : c;
-                roundkey(rk, r, V, c, d);
+                roundkey(rk, i, V, c, d);
             }
         }
                 
