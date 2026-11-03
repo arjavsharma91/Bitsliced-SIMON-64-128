@@ -129,7 +129,7 @@ struct alignas(32) Simon64128Engine {
             }
         }
                 
-}
+};
 
 } // namespace simon
 
