@@ -20,7 +20,7 @@ struct alignas(32) Simon64128Engine {
 
     private:
 
-        static inline void transpose_from_linear(u256 m[]) noexcept {
+        static inline void transpose_from_linear(__m256i m[]) noexcept {
             const __m256i maskfour = _mm256_set1_epi32(0x0f0f0f0f);
             __m256i q[4];
 
@@ -124,7 +124,7 @@ struct alignas(32) Simon64128Engine {
 
             #pragma GCC unroll 40
             for (int i = 4; i < 44; ++i) {
-                __m256i V = v_flags[r-4] ? d : c;
+                __m256i V = v_flags[i-4] ? d : c;
                 roundkey(rk, i, V, c, d);
             }
         }
