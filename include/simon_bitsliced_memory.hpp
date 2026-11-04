@@ -128,6 +128,11 @@ struct alignas(32) Simon64128Engine {
                 roundkey(rk, i, V, c, d);
             }
         }
+
+    public:
+        inline void core_encryption(__m256i a[8], __m256i b[8]) const noexcept {
+            
+
                 
 };
 
