@@ -133,9 +133,12 @@ struct alignas(32) Simon64128Engine {
     public:
         inline void core_encryption(__m256i a[8], __m256i b[8]) const noexcept {
             #pragma GCC unroll 22
-            for (int i=0; i < 44, i += 2) {
+            for (int i=0; i < 44; i += 2) {
                 b[0] = _mm256_xor_si256(_mm256_xor_si256(rotl8(_mm256_xor_si256(_mm256_and_si256(a[0], a[7]), a[6])), rk[i][0]), b[0]);
                 b[1] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_and_si256(a[0], rotl8(a[1])), rk[i][1]), rotl(a[7])), b[1]);
+                #pragma GCC unroll 6
+                for (int j=2; j < 8; ++i) {
+                    
 
                 
 };
