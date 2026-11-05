@@ -8,6 +8,7 @@
 #include <cstddef>
 
 #define rotr8(x) (_mm256_shuffle_epi8(x, _mm256_set1_epi32(0x0c0f0e0d)))
+#define rotl8(x) (_mm256_shuffle_epi8(x, _mm256_set1_epi32(0x0e0d0c0f)))
 
 #if !defined(__AVX2__)
 #error "SIMON Bitsliced Engine requires AVX2 support. Compile with flags: -O3 -mavx2"
@@ -131,7 +132,10 @@ struct alignas(32) Simon64128Engine {
 
     public:
         inline void core_encryption(__m256i a[8], __m256i b[8]) const noexcept {
-            
+            #pragma GCC unroll 22
+            for (int i=0; i < 44, i += 2) {
+                b[0] = _mm256_xor_si256(_mm256_xor_si256(rotl8(_mm256_xor_si256(_mm256_and_si256(a[0], a[7]), a[6])), rk[i][0]), b[0]);
+                b[1] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_and_si256(a[0], rotl8(a[1])), rk[i][1]), rotl(a[7])), b[1]);
 
                 
 };
