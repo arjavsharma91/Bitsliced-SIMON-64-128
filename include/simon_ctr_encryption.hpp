@@ -149,6 +149,12 @@ struct alignas(32) Simon64128Engine {
             }
         }
 
+        inline void encrypt_ctr(uint32_t once[2], uint8_t* out, const uint8_t* in = nullptr) const noexcept {
+            __m256i a[8], b[8];
+            __m256i vec_eight = _mm256_set1_epi32(8);
+
+            __m256i once_upper = _mm256_set1_epi32(once[1]);
+
     
 };
 
