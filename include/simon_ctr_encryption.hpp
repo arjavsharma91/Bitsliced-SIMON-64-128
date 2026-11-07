@@ -131,6 +131,11 @@ struct alignas(32) Simon64128Engine {
         }
 
     public:
+
+        explicit Simon64128Engine(const uint32_t master_key[4]) noexcept {
+            expandkey(round_keys, master_key);
+        }
+
         inline void core_encryption(__m256i a[8], __m256i b[8], __m256i rk[44][8]) const noexcept {
             #pragma GCC unroll 22
             for (int i=0; i < 44; i += 2) {
