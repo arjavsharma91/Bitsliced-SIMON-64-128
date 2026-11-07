@@ -176,11 +176,35 @@ struct alignas(32) Simon64128Engine {
 
             alignas(32) uint32_t x_buf[8][8];
             alignas(32) uint32_t y_buf[8][8];
-
+            #pragma GCC unroll 8
             for (int i = 0; i<8; ++i) {
                 _mm256_store_si256((__m256i*)x_buf[i], a[i]);
                 _mm256_store_si256((__m256i*)y_buf[i], b[i]);
             }
+            #pragma GCC unroll 8
+            for (int i = 0; i< 8; ++i) {
+                uint8_t* dst = out + (k*64);
+                const uint8_t* src = in ? (in + (k*64)) : nullptr;
+
+                alignas(32) uint32_t block_words[16];
+                #pragma GCC unroll 8
+                for (int j = 0; j < 8; ++j) {
+                    block_words[2*j] = y_buf[i][j];
+                    block_words[2*j +1] = x_buf[i][j];
+                }
+
+                #pragma GCC unroll 16
+                for (int j = 0; j<8; ++j) {
+                    uint32_t keystream_word = block_words[j];
+                    // this branching is ok because it doesn't reveal anything related to the encryption, just the size
+                    if (src) {
+                        ((uint32_t*)dst)[j] = ((const uint32_t*)src)[j] ^ keystream_word;
+                    } else {
+                        ((uint32_t*)dst)[j] = keystream_word;
+                    }
+                }
+            }
+        }
 };
 
 } // namespace simon
