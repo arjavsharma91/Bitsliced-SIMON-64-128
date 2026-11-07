@@ -171,6 +171,16 @@ struct alignas(32) Simon64128Engine {
             core_encryption(a, b, round_keys);
             transpose_from_linear(a);
             transpose_from_linear(b);
+
+            once[0] += 64;
+
+            alignas(32) uint32_t x_buf[8][8];
+            alignas(32) uint32_t y_buf[8][8];
+
+            for (int i = 0; i<8; ++i) {
+                _mm256_store_si256((__m256i*)x_buf[i], a[i]);
+                _mm256_store_si256((__m256i*)y_buf[i], b[i]);
+            }
 };
 
 } // namespace simon
