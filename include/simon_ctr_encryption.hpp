@@ -163,7 +163,7 @@ struct alignas(32) Simon64128Engine {
 
             #pragma GCC unroll 7
             for (int i = 1; i < 8; ++i) {
-                b[j] = _mm256_add_epi32(b[j-1], vec_eight);
+                b[i] = _mm256_add_epi32(b[i-1], vec_eight);
             }
 
             transpose_from_linear(a);
@@ -183,8 +183,8 @@ struct alignas(32) Simon64128Engine {
             }
             #pragma GCC unroll 8
             for (int i = 0; i< 8; ++i) {
-                uint8_t* dst = out + (k*64);
-                const uint8_t* src = in ? (in + (k*64)) : nullptr;
+                uint8_t* dst = out + (i*64);
+                const uint8_t* src = in ? (in + (i*64)) : nullptr;
 
                 alignas(32) uint32_t block_words[16];
                 #pragma GCC unroll 8
@@ -194,7 +194,7 @@ struct alignas(32) Simon64128Engine {
                 }
 
                 #pragma GCC unroll 16
-                for (int j = 0; j<8; ++j) {
+                for (int j = 0; j<16; ++j) {
                     uint32_t keystream_word = block_words[j];
                     // this branching is ok because it doesn't reveal anything related to the encryption, just the size
                     if (src) {
