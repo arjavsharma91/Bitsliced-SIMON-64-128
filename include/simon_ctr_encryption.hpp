@@ -145,6 +145,11 @@ struct alignas(32) Simon64128Engine {
                     a[j] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_and_si256(b[j-1], rotl8(b[j])), rk[i+1][j]), b[j-2]), a[j]);
                 }
                 a[0] = _mm256_xor_si256(_mm256_xor_si256(rotl8(_mm256_xor_si256(_mm256_and_si256(b[0], b[7]), b[6])), rk[i+1][0]), a[0]);
+                a[1] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_and_si256(b[0], rotl8(b[1])), rk[i+1][1]), rotl(b[7])), a[1]);
+            }
+        }
+
+    
 };
 
 } // namespace simon
