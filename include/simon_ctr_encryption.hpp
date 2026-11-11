@@ -221,6 +221,11 @@ struct alignas(32) Simon64128Engine {
 
             size_t offset = 0;
 
+            while (length - offset >= 512) {
+                encrypt_ctr(once, output + offset, input ? (input + offset) : nullptr);
+                offset += 512;
+            }
+
             
 };
 
