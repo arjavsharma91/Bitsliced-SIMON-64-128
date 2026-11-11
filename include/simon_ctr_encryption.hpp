@@ -210,6 +210,18 @@ struct alignas(32) Simon64128Engine {
                 }
             }
         }
+
+        void encrypt(const uint8_t* input, uint8_t* output, size_t length, uint64_t initial_counter, uint32_t session_id) const noexcept {
+            //again all the branching here should be fine because its about the size not the encryption
+            if (length == 0) return;
+
+            uint32 once[2];
+            once[0] = static_cast<uint32_t>(initial_counter);
+            once[1] = session_id;
+
+            size_t offset = 0;
+
+            
 };
 
 } // namespace simon
