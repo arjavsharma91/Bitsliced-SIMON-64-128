@@ -215,7 +215,7 @@ struct alignas(32) Simon64128Engine {
             //again all the branching here should be fine because its about the size not the encryption
             if (length == 0) return;
 
-            uint32 once[2];
+            uint32_t once[2];
             once[0] = static_cast<uint32_t>(initial_counter);
             once[1] = session_id;
 
