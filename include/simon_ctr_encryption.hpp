@@ -226,6 +226,17 @@ struct alignas(32) Simon64128Engine {
                 offset += 512;
             }
 
+            size_t remaining = length - offset;
+
+            if (remaining > 0) {
+                alignas(32) uint8_t tailgate[512];
+                encrypt_ctr(once, tailgate, nullptr);
+
+                const uint8_t* src_tail = input ? (input + offset) : nullptr;
+
+                uint8_t* dst_tail = output + offset;
+                
+
             
 };
 
