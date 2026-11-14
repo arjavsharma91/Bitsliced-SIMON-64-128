@@ -235,9 +235,18 @@ struct alignas(32) Simon64128Engine {
                 const uint8_t* src_tail = input ? (input + offset) : nullptr;
 
                 uint8_t* dst_tail = output + offset;
-                
 
-            
+                if (src_tail) {
+                    for (size_t i = 0; i < remaining; ++i) {
+                        dst_tail[i] = src_tail[i] ^ tailgate[i];
+                    }
+                } else {
+                    for (size_t i = 0; i < remaining; ++i) {
+                        dst_tail[i] = tailstream[i];
+                    }
+                }
+            }
+        }       
 };
 
 } // namespace simon
