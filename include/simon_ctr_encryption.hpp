@@ -242,7 +242,7 @@ struct alignas(32) Simon64128Engine {
                     }
                 } else {
                     for (size_t i = 0; i < remaining; ++i) {
-                        dst_tail[i] = tailstream[i];
+                        dst_tail[i] = tailgate[i];
                     }
                 }
             }
