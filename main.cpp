@@ -22,3 +22,16 @@ int main() {
     std::vector<uint8_t> plaintext(test_length);
     std::vector<uint8_t> ciphertext(test_length);
     std::vector<uint8_t> decrypted(test_length);
+
+    for (size_t i = 0; i < test_length; ++i) {
+        plaintext[i] = static_cast<uint8_t>(i * 3 + 17);
+    }
+
+    uint64_t initial_counter = 0x0000000000000000ULL;
+    uint32_t session_id = 0x12345678;
+
+    std::cout << "[*] Encrypting " << test_length << " bytes using CTR mode...\n";
+    engine.encrypt(plaintext.data(), ciphertext.data(), test_length, initial_counter, session_id);
+
+    std::cout << "[*] Decrypting (re-generating keystream with same nonce/counter) ...\n";
+    engine.encrypt(ciphertext.data(), decrypted.data(), test_length, initial_counter, session_id);
