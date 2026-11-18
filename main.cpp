@@ -35,3 +35,23 @@ int main() {
 
     std::cout << "[*] Decrypting (re-generating keystream with same nonce/counter) ...\n";
     engine.encrypt(ciphertext.data(), decrypted.data(), test_length, initial_counter, session_id);
+
+    bool success = true;
+    for (size_t i = 0; i < test_length; ++i) {
+        if (plaintext[i] != decrypted[i]) {
+            std::cerr << "[!] Mismatch at byte " << i << ": expected 0x" 
+                      << std::hex << (int)plaintext[i] << ", got 0x" << (int)decrypted[i] << std::dec << "\n";
+            success = false;
+            break;
+        }
+    }
+
+    if (success) {
+        std::cout << "[+] SUCCESS: CTR mode roundtrip encryption/decryption matched perfectly across 520 bytes (Batch + Tail)!\n";
+    } else {
+        std::cout << "[-] FAILURE: Data mismatch detected.\n";
+    }
+
+    return success ? 0 : 1;
+}
+
