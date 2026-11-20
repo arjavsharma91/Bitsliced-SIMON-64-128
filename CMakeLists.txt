@@ -1,21 +1,32 @@
-cmake_minimum_required(VERSION 3.14)
-project(SimonBitsliceAVX2 CXX)
+cmake_minimum_required(VERSION 3.16)
+project(SimonBitsliceEngine LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(MSVC)
-    add_compile_options(/O2 /arch:AVX2)
-else()
-    add_compile_options(-O3 -march=native -mavx2)
+# Require CMake to run from a build directory rather than polluting the source tree
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR "Please build out-of-source (e.g., cmake -B build && cmake --build build).")
 endif()
 
-add_library(simon_engine INTERFACE)
-target_include_directories(simon_engine INTERFACE 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-)
-
 add_executable(simon_test main.cpp)
-target_link_libraries(simon_test PRIVATE simon_engine)
+
+# Expose the current directory so your header can be included cleanly
+target_include_directories(simon_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Apply AVX2 and optimization flags on GCC/Clang
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(simon_test PRIVATE
+        -O3
+        -mavx2
+        -Wall
+        -Wextra
+    )
+elseif(MSVC)
+    target_compile_options(simon_test PRIVATE
+        /O2
+        /arch:AVX2
+        /W4
+    )
+endif()
