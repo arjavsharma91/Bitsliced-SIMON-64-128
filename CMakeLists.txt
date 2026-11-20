@@ -5,17 +5,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Require CMake to run from a build directory rather than polluting the source tree
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "Please build out-of-source (e.g., cmake -B build && cmake --build build).")
 endif()
 
 add_executable(simon_test main.cpp)
 
-# Expose the current directory so your header can be included cleanly
-target_include_directories(simon_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(simon_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Apply AVX2 and optimization flags on GCC/Clang
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(simon_test PRIVATE
         -O3
