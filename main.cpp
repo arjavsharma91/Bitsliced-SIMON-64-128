@@ -132,4 +132,32 @@ int main() {
                   << (ok ? "[OK]" : "[MISMATCH]") << "\n";
     }
 
+    std::cout << std::dec << "Round key mismatches: " << rk_mismatches << "/44\n\n";
+
+    __m256i a[8], b[8];
+    pack_lane0_word(Pt[1], a); 
+    pack_lane0_word(Pt[0], b);  
+
+    std::cout << "=== 3. Encryption Rounds (Pt_1..Pt_44) ===\n";
+    int pt_mismatches = 0;
+    for (int r = 0; r < 44; r += 2) {
+        step_two_rounds(a, b, engine.round_keys, r);
+
+        uint32_t pt1_hi = extract_lane0_word(b);
+        uint32_t pt1_lo = extract_lane0_word(a);
+        bool ok1 = (pt1_hi == expected_pt_rounds[r].first && pt1_lo == expected_pt_rounds[r].second);
+        if (!ok1) ++pt_mismatches;
+
+        std::cout << std::hex << std::setfill('0')
+                  << "Pt_" << std::dec << std::setw(2) << std::setfill(' ') << (r + 1) << std::hex << std::setfill('0')
+                  << " = (" << std::setw(8) << pt1_hi << "," << std::setw(8) << pt1_lo << ")"
+                  << " (expected (" << std::setw(8) << expected_pt_rounds[r].first << ","
+                  << std::setw(8) << expected_pt_rounds[r].second << ")) "
+                  << (ok1 ? "[OK]" : "[MISMATCH]") << "\n";
+
+        uint32_t pt2_hi = extract_lane0_word(a);
+        uint32_t pt2_lo = extract_lane0_word(b);
+        bool ok2 = (pt2_hi == expected_pt_rounds[r + 1].first && pt2_lo == expected_pt_rounds[r + 1].second);
+        if (!ok2) ++pt_mismatches;
+
 
