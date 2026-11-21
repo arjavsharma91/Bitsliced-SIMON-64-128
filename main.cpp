@@ -160,4 +160,31 @@ int main() {
         bool ok2 = (pt2_hi == expected_pt_rounds[r + 1].first && pt2_lo == expected_pt_rounds[r + 1].second);
         if (!ok2) ++pt_mismatches;
 
+        std::cout << std::hex << std::setfill('0')
+                  << "Pt_" << std::dec << std::setw(2) << std::setfill(' ') << (r + 2) << std::hex << std::setfill('0')
+                  << " = (" << std::setw(8) << pt2_hi << "," << std::setw(8) << pt2_lo << ")"
+                  << " (expected (" << std::setw(8) << expected_pt_rounds[r + 1].first << ","
+                  << std::setw(8) << expected_pt_rounds[r + 1].second << ")) "
+                  << (ok2 ? "[OK]" : "[MISMATCH]") << "\n";
+    }
+    std::cout << std::dec << "Round state mismatches: " << pt_mismatches << "/44\n\n";
 
+    uint32_t Ct[2] = { extract_lane0_word(b), extract_lane0_word(a) }; 
+    uint8_t ct_bytes[8] = {0};
+    std::memcpy(ct_bytes, Ct, sizeof(ct_bytes));
+
+    std::cout << "=== 4. Final Ciphertext ===\n";
+    std::cout << std::hex << std::setfill('0')
+              << "Ct=(Ct[1],Ct[0]) = (" << std::setw(8) << Ct[1] << "," << std::setw(8) << Ct[0] << ")"
+              << " [expected (44c8fc20,b9dfa07a)]\n" << std::dec;
+    print_bytes("Actual ct   : ", ct_bytes, 8);
+    print_bytes("Expected ct : ", expected_ct_bytes, 8);
+
+    if (rk_mismatches == 0 && pt_mismatches == 0 && std::memcmp(ct_bytes, expected_ct_bytes, 8) == 0) {
+        std::cout << "\n[+] FULL PASS: Every round key, round state, and final ciphertext byte matches the NSA spec!\n";
+        return 0;
+    }
+
+    std::cout << "\n[-] MISMATCH DETECTED: See first [MISMATCH] line above.\n";
+    return 1;
+}
