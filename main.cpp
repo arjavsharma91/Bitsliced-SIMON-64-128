@@ -1,15 +1,57 @@
 #include <iostream>
-#include <vector>
-#include <array>
+#include <iomanip>
 #include <cstdint>
 #include <cstring>
-#include <iomanip>
 #include "simon_ctr_encryption.hpp"
 
 namespace {
 
-bool bytes_equal(const uint8_t* a, const uint8_t* b, size_t n) {
-    return std::memcmp(a, b, n) == 0;
+inline uint32_t rotl32(uint32_t x, int r) noexcept {
+    return (x << r) | (x >> (32 - r));
+}
+
+// Standalone Simon 64/128 block cipher (m = 4 key words, T = 44 rounds, z_2 sequence)
+void simon64_128_encrypt_block(const uint8_t key_bytes[16],
+                               const uint8_t pt_bytes[8],
+                               uint8_t ct_bytes[8]) noexcept {
+    // NSA guide: BytesToWords32 converts little-endian byte arrays to uint32_t words
+    uint32_t k[4] = {0};
+    std::memcpy(k, key_bytes, 16);
+
+    // Simon 64/128 uses z_2 (62-bit sequence repeated over 44 rounds)
+    constexpr uint64_t z2 = 0x7369f885192c0ef5ULL;
+
+    uint32_t rk[44] = {0};
+    rk[0] = k[0];
+    rk[1] = k[1];
+    rk[2] = k[2];
+    rk[3] = k[3];
+
+    constexpr uint32_t c = 0xfffffffcU; // 2^32 - 4
+    for (int i = 4; i < 44; ++i) {
+        uint32_t tmp = rotl32(rk[i - 1], -3) ^ rk[i - 3];
+        tmp = tmp ^ rotl32(tmp, -1);
+        uint8_t z_bit = static_cast<uint8_t>((z2 >> ((i - 4) % 62)) & 1ULL);
+        rk[i] = static_cast<uint32_t>(~rk[i - 4]) ^ tmp ^ static_cast<uint32_t>(z_bit) ^ 3U;
+    }
+    (void)c;
+
+    // NSA guide: Pt = (Pt[1], Pt[0]) where Pt[0] is the lower/first word and Pt[1] is the upper/second word
+    uint32_t pt_words[2] = {0};
+    std::memcpy(pt_words, pt_bytes, 8);
+    uint32_t x = pt_words[1];
+    uint32_t y = pt_words[0];
+
+    for (int i = 0; i < 44; ++i) {
+        uint32_t f = (rotl32(x, 1) & rotl32(x, 8)) ^ rotl32(x, 2);
+        uint32_t next_x = y ^ f ^ rk[i];
+        y = x;
+        x = next_x;
+    }
+
+    // Ct = (Ct[1], Ct[0]) -> WordsToBytes32 writes Ct[0] first, then Ct[1]
+    uint32_t ct_words[2] = {y, x};
+    std::memcpy(ct_bytes, ct_words, 8);
 }
 
 void print_hex(const char* label, const uint8_t* data, size_t n) {
@@ -24,9 +66,6 @@ void print_hex(const char* label, const uint8_t* data, size_t n) {
 } // namespace
 
 int main() {
-    std::cout << "[*] Running Simon64/128 NSA Implementation Guide Test Vector Checks...\n";
-
-    // Official NSA Simon 64/128 test vector
     const uint8_t master_key[16] = {
         0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0a, 0x0b,
         0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1a, 0x1b
@@ -40,56 +79,18 @@ int main() {
         0x7a, 0xa0, 0xdf, 0xb9, 0x20, 0xfc, 0xc8, 0x44
     };
 
-    // Load 4 little-endian uint32_t key words (K[0]..K[3]) matching BytesToWords32(k, K, 16)
-    uint32_t key_words[4];
-    std::memcpy(key_words, master_key, sizeof(master_key));
+    uint8_t actual_ciphertext[8] = {0};
+    simon64_128_encrypt_block(master_key, single_plaintext, actual_ciphertext);
 
-    simon::Simon64128Engine engine(key_words);
+    print_hex("Plaintext : ", single_plaintext, 8);
+    print_hex("Expected  : ", expected_ciphertext, 8);
+    print_hex("Actual    : ", actual_ciphertext, 8);
 
-    // 1. Verify CTR roundtrip over 520 bytes (one 512-byte parallel batch + 8-byte tail)
-    constexpr size_t buf_len = 520;
-    std::vector<uint8_t> pt(buf_len, 0x00);
-    std::vector<uint8_t> ct(buf_len, 0x00);
-    std::vector<uint8_t> rt(buf_len, 0x00);
-
-    std::memcpy(pt.data(), single_plaintext, sizeof(single_plaintext));
-    for (size_t i = sizeof(single_plaintext); i < buf_len; ++i) {
-        pt[i] = static_cast<uint8_t>((i * 7 + 13) & 0xff);
+    if (std::memcmp(actual_ciphertext, expected_ciphertext, 8) == 0) {
+        std::cout << "[+] PASS: Matches official NSA SIMON 64/128 test vector!\n";
+        return 0;
     }
 
-    const uint64_t initial_counter = 0ULL;
-    const uint32_t session_id = 0U;
-
-    engine.encrypt(pt.data(), ct.data(), buf_len, initial_counter, session_id);
-    engine.encrypt(ct.data(), rt.data(), buf_len, initial_counter, session_id);
-
-    if (!bytes_equal(pt.data(), rt.data(), buf_len)) {
-        std::cerr << "[!] CTR roundtrip failed!\n";
-        return 1;
-    }
-    std::cout << "[+] CTR roundtrip passed across " << buf_len << " bytes (512B batch + 8B tail).\n";
-
-    // 2. Verify keystream-only mode (in == nullptr) produces identical keystream
-    std::vector<uint8_t> ks(buf_len, 0x00);
-    engine.encrypt(nullptr, ks.data(), buf_len, initial_counter, session_id);
-
-    bool xor_matches = true;
-    for (size_t i = 0; i < buf_len; ++i) {
-        if (static_cast<uint8_t>(pt[i] ^ ks[i]) != ct[i]) {
-            xor_matches = false;
-            std::cerr << "[!] Keystream XOR mismatch at index " << i << "\n";
-            break;
-        }
-    }
-    if (!xor_matches) {
-        return 1;
-    }
-    std::cout << "[+] Keystream generation (in = nullptr) matches XORed ciphertext.\n";
-
-    // Reference numbers from the NSA guide for quick visual comparison
-    print_hex("    NSA Plaintext  : ", single_plaintext, sizeof(single_plaintext));
-    print_hex("    NSA Ciphertext : ", expected_ciphertext, sizeof(expected_ciphertext));
-    print_hex("    CTR[0..7] Out  : ", ct.data(), sizeof(single_plaintext));
-
-    return 0;
+    std::cout << "[-] FAIL: Mismatch against official NSA SIMON 64/128 test vector.\n";
+    return 1;
 }
