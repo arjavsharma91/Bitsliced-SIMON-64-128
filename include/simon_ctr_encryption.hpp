@@ -136,7 +136,7 @@ struct alignas(32) Simon64128Engine {
             expandkey(round_keys, master_key);
         }
 
-        inline void core_encryption(__m256i a[8], __m256i b[8], __m256i rk[44][8]) const noexcept {
+        inline void core_encryption(__m256i a[8], __m256i b[8], const __m256i rk[44][8]) const noexcept {
             #pragma GCC unroll 22
             for (int i=0; i < 44; i += 2) {
                 b[0] = _mm256_xor_si256(_mm256_xor_si256(rotl8(_mm256_xor_si256(_mm256_and_si256(a[0], a[7]), a[6])), rk[i][0]), b[0]);
