@@ -44,3 +44,14 @@ void step_two_rounds(__m256i a[8], __m256i b[8], const __m256i rk[44][8], int r)
     a[0] = _mm256_xor_si256(_mm256_xor_si256(rotl8(_mm256_xor_si256(_mm256_and_si256(b[0], b[7]), b[6])), rk[r + 1][0]), a[0]);
     a[1] = _mm256_xor_si256(_mm256_xor_si256(_mm256_xor_si256(_mm256_and_si256(b[0], rotl8(b[1])), rk[r + 1][1]), rotl8(b[7])), a[1]);
 }
+
+void print_bytes(const char* label, const uint8_t* data, size_t len) {
+    std::cout << label;
+    for (size_t i = 0; i < len; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0')
+                  << static_cast<int>(data[i]) << (i + 1 < len ? " " : "");
+    }
+    std::cout << std::dec << "\n";
+}
+
+} // namespace
