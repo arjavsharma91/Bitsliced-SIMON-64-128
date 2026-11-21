@@ -106,4 +106,19 @@ int main() {
         {0xb9dfa07aU, 0xe5c97bedU}, {0x44c8fc20U, 0xb9dfa07aU}
     }};
 
+    uint32_t Pt[2] = {0};
+    uint32_t K[4] = {0};
+    std::memcpy(Pt, pt_bytes, sizeof(Pt));
+    std::memcpy(K, k_bytes, sizeof(K));
+
+    std::cout << std::hex << std::setfill('0');
+    std::cout << "=== 1. Word Conversion ===\n";
+    std::cout << "Pt=(Pt[1],Pt[0]) = (" << std::setw(8) << Pt[1] << "," << std::setw(8) << Pt[0] << ")"
+              << " [expected (656b696c,20646e75)]\n";
+    std::cout << "K =(K[3..0])     = (" << std::setw(8) << K[3] << "," << std::setw(8) << K[2] << ","
+              << std::setw(8) << K[1] << "," << std::setw(8) << K[0] << ")"
+              << " [expected (1b1a1918,13121110,0b0a0908,03020100)]\n\n";
+
+    
+
 
