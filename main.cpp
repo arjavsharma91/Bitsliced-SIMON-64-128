@@ -119,6 +119,17 @@ int main() {
               << std::setw(8) << K[1] << "," << std::setw(8) << K[0] << ")"
               << " [expected (1b1a1918,13121110,0b0a0908,03020100)]\n\n";
 
-    
+    std::cout << "=== 2. Round Keys (rk[0..43]) ===\n";
+    int rk_mismatches = 0;
+    for (int r = 0; r < 44; ++r) {
+        uint32_t actual_rk = extract_lane0_word(engine.round_keys[r]);
+        bool ok = (actual_rk == expected_rk[r]);
+        if (!ok) ++rk_mismatches;
+
+        std::cout << "rk[" << std::dec << std::setw(2) << std::setfill(' ') << r << std::hex << std::setfill('0') << "] = "
+                  << std::setw(8) << actual_rk
+                  << " (expected " << std::setw(8) << expected_rk[r] << ") "
+                  << (ok ? "[OK]" : "[MISMATCH]") << "\n";
+    }
 
 
