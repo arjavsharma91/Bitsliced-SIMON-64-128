@@ -68,7 +68,6 @@ int main() {
     };
     const uint8_t expected_ct_bytes[8] = {0x7a, 0xa0, 0xdf, 0xb9, 0x20, 0xfc, 0xc8, 0x44};
 
-    // Official NSA rk[0..43]
     const std::array<uint32_t, 44> expected_rk = {{
         0x03020100U, 0x0b0a0908U, 0x13121110U, 0x1b1a1918U,
         0x70a011c3U, 0xb770ec49U, 0x57e3e835U, 0xd397bc42U,
@@ -83,7 +82,6 @@ int main() {
         0x18199c02U, 0x719e3f1cU, 0x0c1cf793U, 0x15df4696U
     }};
 
-    // Official NSA Pt_1..Pt_44 pairs: {Pt_i[1], Pt_i[0]}
     const std::array<std::pair<uint32_t, uint32_t>, 44> expected_pt_rounds = {{
         {0xfc8b8a84U, 0x656b696cU}, {0x154d4e7fU, 0xfc8b8a84U},
         {0xb2a6be7cU, 0x154d4e7fU}, {0xe0c1d225U, 0xb2a6be7cU},
@@ -144,7 +142,7 @@ int main() {
     std::cout << "=== 3. Encryption Rounds (Pt_1..Pt_44) ===\n";
     int pt_mismatches = 0;
     for (int r = 0; r < 44; r += 2) {
-        step_two_rounds(a, b, engine.round_keys, r);
+        step_round_even(a, b, engine.round_keys, r);
 
         uint32_t pt1_hi = extract_lane0_word(b);
         uint32_t pt1_lo = extract_lane0_word(a);
@@ -157,6 +155,8 @@ int main() {
                   << " (expected (" << std::setw(8) << expected_pt_rounds[r].first << ","
                   << std::setw(8) << expected_pt_rounds[r].second << ")) "
                   << (ok1 ? "[OK]" : "[MISMATCH]") << "\n";
+
+        step_round_odd(a, b, engine.round_keys, r);
 
         uint32_t pt2_hi = extract_lane0_word(a);
         uint32_t pt2_lo = extract_lane0_word(b);
@@ -172,7 +172,7 @@ int main() {
     }
     std::cout << std::dec << "Round state mismatches: " << pt_mismatches << "/44\n\n";
 
-    uint32_t Ct[2] = { extract_lane0_word(b), extract_lane0_word(a) }; 
+    uint32_t Ct[2] = { extract_lane0_word(b), extract_lane0_word(a) };
     uint8_t ct_bytes[8] = {0};
     std::memcpy(ct_bytes, Ct, sizeof(ct_bytes));
 
