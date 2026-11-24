@@ -254,4 +254,4 @@ struct alignas(32) Simon64128Engine {
 
 } // namespace simon
 
-#endif SIMON_CTR_ENCRYPTION_HPP
+#endif //SIMON_CTR_ENCRYPTION_HPP
