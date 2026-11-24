@@ -61,3 +61,9 @@ uint8_t do_one_computation(uint8_t* data) {
 }
 
 } // extern "C"
+
+int main() {
+    dudect_config_t config = {
+        .chunk_size = kChunkBytes,
+        .number_measurements = 10000,
+    }
