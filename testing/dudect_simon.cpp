@@ -21,3 +21,19 @@ std::mt19937_64& rng() {
     static std::mt19937_64 gen(0xC0FFEE123456789ULL);
     return gen;
 }
+
+void fill_random_bytes(int8_t* dst, size_t len) {
+    auto& gen = rng();
+    size_t i = 0;
+    while (i + 8 <= len) {
+        uint64_t r = gen();
+        std::memcpy(dst + i, &r, sizeof(r));
+        i += 8;
+    }
+    if (i < len) {
+        uint64_t r = gen();
+        std::memcpy(dst + i, &r, len - i);
+    }
+}
+
+} // namespace
