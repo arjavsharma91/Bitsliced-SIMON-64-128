@@ -1,7 +1,7 @@
 // this uses hackers delight chapter 7 bit matrix transposition
 
-#ifndef SIMON_BITSLICE_MEMORY_HPP
-#define SIMON_BITSLICE_MEMORY_HPP
+#ifndef SIMON_CTR_ENCRYPTION_HPP
+#define SIMON_CTR_ENCRYPTION_HPP
 
 #include <immintrin.h>
 #include <cstdint>
@@ -251,4 +251,4 @@ struct alignas(32) Simon64128Engine {
 
 } // namespace simon
 
-#endif // SIMON_BITSLICE_MEMORY_HPP
+#endif SIMON_CTR_ENCRYPTION_HPP
