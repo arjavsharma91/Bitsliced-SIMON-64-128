@@ -45,4 +45,11 @@ void prepare_inputs(dudect_config_t* c, uint8_t* input_data, uint8_t* classes) {
     for (size_t i = 0; i < c->number_measurements; ++i) {
         uint8_t cls = static_cast<uint8_t>(gen() & 1ULL);
         classes[i] = cls;
-
+        uint8_t* slot = input_data + i * c->chunk_size;
+        if (cls == 0) {
+            std::memset(slot, 0x00, c->chunk_size);
+        } else {
+            fill_random_bytes(slot, c->chunk_size);
+        }
+    }
+}
