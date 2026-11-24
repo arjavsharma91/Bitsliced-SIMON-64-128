@@ -67,3 +67,15 @@ int main() {
         .chunk_size = kChunkBytes,
         .number_measurements = 10000,
     }
+
+    dudect_ctx_t ctx;
+    dudect_init(&ctx, &config);
+
+    dudect_state_t state = DUDECT_NO_LEAKAGE_EVIDENCE_YET;
+    while (state == DUDECT_NO_LEAKAGE_EVIDENCE_YET) {
+        state = dudect_main(&ctx);
+    }
+
+    dudect_free(&ctx);
+    return static_cast<int>(state);
+}
