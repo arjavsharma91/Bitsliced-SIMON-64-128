@@ -6,6 +6,7 @@
 #include <immintrin.h>
 #include <cstdint>
 #include <cstddef>
+#include <cstring>
 
 #define rotr8(x) (_mm256_shuffle_epi8(x, _mm256_set_epi32(0x0c0f0e0d,0x080b0a09,0x04070605,0x00030201,0x0c0f0e0d,0x080b0a09,0x04070605,0x00030201)))
 #define rotl8(x) (_mm256_shuffle_epi8(x, _mm256_set_epi32(0x0e0d0c0f,0x0a09080b,0x06050407,0x02010003,0x0e0d0c0f,0x0a09080b,0x06050407,0x02010003)))
@@ -199,13 +200,15 @@ struct alignas(32) Simon64128Engine {
                 }
 
                 #pragma GCC unroll 16
-                for (int j = 0; j<16; ++j) {
+                for (int j = 0; j < 16; ++j) {
                     uint32_t keystream_word = block_words[j];
-                    // this branching is ok because it doesn't reveal anything related to the encryption, just the size
                     if (src) {
-                        ((uint32_t*)dst)[j] = ((const uint32_t*)src)[j] ^ keystream_word;
+                        uint32_t src_word = 0;
+                        std::memcpy(&src_word, src + j * sizeof(uint32_t), sizeof(src_word));
+                        uint32_t out_word = src_word ^ keystream_word;
+                        std::memcpy(dst + j * sizeof(uint32_t), &out_word, sizeof(out_word));
                     } else {
-                        ((uint32_t*)dst)[j] = keystream_word;
+                        std::memcpy(dst + j * sizeof(uint32_t), &keystream_word, sizeof(keystream_word));
                     }
                 }
             }
