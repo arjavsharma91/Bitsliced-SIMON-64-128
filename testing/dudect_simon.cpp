@@ -16,3 +16,8 @@ const uint32_t kFixedKey[4] = {
 const simon::Simon64128Engine g_engine(kFixedKey);
 alignas(32) uint8_t g_output[kChunkBytes];
 volatile uint8_t g_sink = 0;
+
+std::mt19937_64& rng() {
+    static std::mt19937_64 gen(0xC0FFEE123456789ULL);
+    return gen;
+}
