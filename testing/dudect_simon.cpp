@@ -22,7 +22,7 @@ std::mt19937_64& rng() {
     return gen;
 }
 
-void fill_random_bytes(int8_t* dst, size_t len) {
+void fill_random_bytes(uint8_t* dst, size_t len) {
     auto& gen = rng();
     size_t i = 0;
     while (i + 8 <= len) {
