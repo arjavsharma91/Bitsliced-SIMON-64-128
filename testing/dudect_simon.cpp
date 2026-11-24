@@ -66,7 +66,7 @@ int main() {
     dudect_config_t config = {
         .chunk_size = kChunkBytes,
         .number_measurements = 10000,
-    }
+    };
 
     dudect_ctx_t ctx;
     dudect_init(&ctx, &config);
