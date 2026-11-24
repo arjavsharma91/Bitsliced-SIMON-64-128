@@ -37,3 +37,12 @@ void fill_random_bytes(uint8_t* dst, size_t len) {
 }
 
 } // namespace
+
+extern "C" {
+
+void prepare_inputs(dudect_config_t* c, uint8_t* input_data, uint8_t* classes) {
+    auto& gen = rng();
+    for (size_t i = 0; i < c->number_measurements; ++i) {
+        uint8_t cls = static_cast<uint8_t>(gen() & 1ULL);
+        classes[i] = cls;
+
