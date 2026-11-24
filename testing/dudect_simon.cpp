@@ -53,3 +53,11 @@ void prepare_inputs(dudect_config_t* c, uint8_t* input_data, uint8_t* classes) {
         }
     }
 }
+
+uint8_t do_one_computation(uint8_t* data) {
+    g_engine.encrypt(data, g_output, kChunkBytes, 0ULL, 1U);
+    g_sink ^= g_output[0] ^ g_output[kChunkBytes - 1];
+    return g_sink;
+}
+
+} // extern "C"
