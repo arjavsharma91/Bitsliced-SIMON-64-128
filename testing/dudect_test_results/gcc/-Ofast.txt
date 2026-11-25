@@ -1,3 +1,6 @@
+Compilation: g++ -std=c++17 -Ofast -mavx2 -Iinclude -I. testing/dudect_simon.cpp -lm -o build/dudect_simon_Ofast
+Command: timeout 60 taskset -c 2 ./build/dudect_simon_Ofast
+
 meas:    0.01 M, not enough measurements (11 still to go).
 meas:    0.02 M, max t:   +0.53, max tau: 3.77e-03, (5/tau)^2: 1.76e+06. For the moment, maybe constant time.
 meas:    0.03 M, max t:   +3.28, max tau: 2.01e-02, (5/tau)^2: 6.20e+04. For the moment, maybe constant time.
