@@ -1,0 +1,2 @@
+Compilation: clang++ -std=c++17 -O1 -mavx2 -Iinclude -I. testing/dudect_simon.cpp -lm -o build/dudect_simon_O1
+Command: timeout 60 taskset -c 2 ./build/dudect_simon_O1
