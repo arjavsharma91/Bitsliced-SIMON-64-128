@@ -198,25 +198,26 @@ struct alignas(32) Simon64128Engine {
 
             alignas(32) uint32_t x_buf[8][8];
             alignas(32) uint32_t y_buf[8][8];
-            #pragma GCC unroll 8
-            for (int i = 0; i<8; ++i) {
-                _mm256_store_si256((__m256i*)x_buf[i], a[i]);
-                _mm256_store_si256((__m256i*)y_buf[i], b[i]);
-            }
-            #pragma GCC unroll 8
-            for (int i = 0; i< 8; ++i) {
-                uint8_t* dst = out + (i*64);
-                const uint8_t* src = in ? (in + (i*64)) : nullptr;
+            detail::unroll_range<0, 8>([&](auto idx) noexcept {
+                constexpr int i = idx.value;
+                _mm256_store_si256(reinterpret_cast<__m256i*>(x_buf[i]), a[i]);
+                _mm256_store_si256(reinterpret_cast<__m256i*>(y_buf[i]), b[i]);
+            });
+
+            detail::unroll_range<0, 8>([&](auto i_idx) noexcept {
+                constexpr int i = i_idx.value;
+                uint8_t* dst = out + (i * 64);
+                const uint8_t* src = in ? (in + (i * 64)) : nullptr;
 
                 alignas(32) uint32_t block_words[16];
-                #pragma GCC unroll 8
-                for (int j = 0; j < 8; ++j) {
-                    block_words[2*j] = y_buf[i][j];
-                    block_words[2*j +1] = x_buf[i][j];
-                }
+                detail::unroll_range<0, 8>([&](auto j_idx) noexcept {
+                    constexpr int j = j_idx.value;
+                    block_words[2 * j] = y_buf[i][j];
+                    block_words[2 * j + 1] = x_buf[i][j];
+                });
 
-                #pragma GCC unroll 16
-                for (int j = 0; j < 16; ++j) {
+                detail::unroll_range<0, 16>([&](auto j_idx) noexcept {
+                    constexpr int j = j_idx.value;
                     uint32_t keystream_word = block_words[j];
                     if (src) {
                         uint32_t src_word = 0;
@@ -226,8 +227,8 @@ struct alignas(32) Simon64128Engine {
                     } else {
                         std::memcpy(dst + j * sizeof(uint32_t), &keystream_word, sizeof(keystream_word));
                     }
-                }
-            }
+                });
+            });
         }
 
         void encrypt(const uint8_t* input, uint8_t* output, size_t length, uint64_t initial_counter, uint32_t session_id) const noexcept {
