@@ -176,17 +176,17 @@ struct alignas(32) Simon64128Engine {
             __m256i vec_eight = _mm256_set1_epi32(8);
 
             __m256i once_upper = _mm256_set1_epi32(once[1]);
-            #pragma GCC unroll 8
-            for (int i = 0; i < 8; ++i) {
+            detail::unroll_range<0, 8>([&](auto idx) noexcept {
+                constexpr int i = idx.value;
                 a[i] = once_upper;
-            }
+            });
 
             b[0] = _mm256_set_epi32(once[0] + 7, once[0] + 6, once[0] + 5, once[0] + 4, once[0] + 3, once[0] + 2, once[0] + 1, once[0]);
 
-            #pragma GCC unroll 7
-            for (int i = 1; i < 8; ++i) {
+            detail::unroll_range<1, 8>([&](auto idx) noexcept {
+                constexpr int i = idx.value;
                 b[i] = _mm256_add_epi32(b[i-1], vec_eight);
-            }
+            });
 
             transpose_from_linear(a);
             transpose_from_linear(b);
