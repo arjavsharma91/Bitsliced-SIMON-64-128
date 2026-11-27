@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstring>
+#include <type_traits>
+#include <utility>
 
 #define rotr8(x) (_mm256_shuffle_epi8(x, _mm256_set_epi32(0x0c0f0e0d,0x080b0a09,0x04070605,0x00030201,0x0c0f0e0d,0x080b0a09,0x04070605,0x00030201)))
 #define rotl8(x) (_mm256_shuffle_epi8(x, _mm256_set_epi32(0x0e0d0c0f,0x0a09080b,0x06050407,0x02010003,0x0e0d0c0f,0x0a09080b,0x06050407,0x02010003)))
