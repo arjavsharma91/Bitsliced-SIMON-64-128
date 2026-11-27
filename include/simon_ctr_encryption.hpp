@@ -120,13 +120,15 @@ struct alignas(32) Simon64128Engine {
         }
 
         inline void expandkey(__m256i rk[44][8], const uint32_t f[4]) noexcept {
-            for (int i=0 ; i < 4 ; i++) {
-                __m256i broadcast = _mm256_set1_epi32(f[i]);
-                for (int j=0 ; j < 8 ; j++) {
+            detail::unroll_range<0, 4>([&](auto i_idx) noexcept {
+                constexpr int i = i_idx.value;
+                const __m256i broadcast = _mm256_set1_epi32(f[i]);
+                detail::unroll_range<0, 8>([&](auto j_idx) noexcept {
+                    constexpr int j = j_idx.value;
                     rk[i][j] = broadcast;
-                }
+                });
                 transpose_from_linear(rk[i]);
-            }
+            });
 
             static const uint8_t v_flags[40] = {
                 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0,
