@@ -137,11 +137,11 @@ struct alignas(32) Simon64128Engine {
             const __m256i c = _mm256_set1_epi32(0xFFFFFF00);
             const __m256i d = _mm256_set1_epi32(0xFFFFFFFF);
 
-            #pragma GCC unroll 40
-            for (int i = 4; i < 44; ++i) {
-                __m256i V = v_flags[i-4] ? d : c;
+            detail::unroll_range<4, 44>([&](auto idx) noexcept {
+                constexpr int i = idx.value;
+                __m256i V = v_flags[i - 4] ? d : c;
                 roundkey(rk, i, V, c, d);
-            }
+            });
         }
 
     public:
