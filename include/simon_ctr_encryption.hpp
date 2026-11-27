@@ -22,7 +22,13 @@ namespace simon {
 namespace detail {
 template <int Start, int End, int Step = 1, typename Fn>
 constexpr void unroll_range(Fn&& fn) noexcept {
-    
+    if constexpr (Start < End) {
+        fn(std::integral_constant<int, Start>{});
+        unroll_range<Start + Step, End, Step>(std::forward<Fn>(fn));
+    }
+}
+
+} // namespace detail
 
 struct alignas(32) Simon64128Engine {
     __m256i round_keys[44][8];
